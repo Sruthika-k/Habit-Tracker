@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habit Tracker</title>
+    <link rel="icon" type="image/x-icon" href="../calendar.jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1 id="title">Month</h1>
+    <h2 id="subtitle">Monthly Habit Tracker</h2>
+
+    <div id="calendarContainer">
+        <div id="calendarDiv">
+            <div id="calendarHeading">
+                <p id="habitTitle">Click to set your habit</p>
+                <p id="totalDays">0/31</p>
+            </div>
+            <div id="calendarContent">
+                <div id="tracker"></div>
+            </div>
+        </div>
+    </div>
+    <button id="resetbutton">Reset</button>
+</body>
+<style>
+    body {
+        background-image: url("cloud1.jpeg");
+        background-size: cover;
+        background-color: rgb(241, 227, 255);
+        background-blend-mode: lighten;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h1, h2 {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    #title {
+        margin-top: 50px;
+        font-size: 28px;
+    }
+
+    #calendarDiv {
+        background-color: white;
+        border-radius: 15px;
+        margin: auto;
+        text-align: center;
+        width: 90%;
+        max-width: 600px;
+        padding: 20px;
+        box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    #calendarHeading {
+        display: flex;
+        justify-content: space-between;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 18px;
+        background: linear-gradient(45deg, #ff758c, #ff7eb3);
+        color: white;
+        font-weight: bold;
+    }
+
+    #tracker {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 10px;
+        padding: 15px;
+    }
+
+    .day {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        text-align: center;
+        border-radius: 10px;
+        border: 2px solid #ff758c;
+        background-color: #ffebf0;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .day:hover {
+        background-color: #ffccd5;
+        transform: scale(1.1);
+    }
+
+    .completed {
+        background-color: #76c893 !important;
+        color: white;
+    }
+
+    #habitTitle {
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    #habitTitle:hover {
+        color: gold;
+        text-decoration: underline;
+    }
+
+    .today {
+        border: 3px solid gold;
+        background-color: #fff7b3;
+        box-shadow: 0px 0px 10px rgba(255, 215, 0, 0.7);
+    }
+
+    #resetbutton {
+        margin-top: 20px;
+        padding: 10px 20px;
+        border: none;
+        background: #ff758c;
+        color: white;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    #resetbutton:hover {
+        background: #ff4f6d;
+    }
+
+    @keyframes pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+
+    .clicked {
+        animation: pop 0.2s ease-in-out;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let date = new Date();
+        let currentMonth = date.getMonth();
+        let currentYear = date.getFullYear();
+        let daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        document.getElementById("title").innerHTML = `🎀 ${months[currentMonth]} 🎀`;
+        document.getElementById("totalDays").innerText = `0/${daysInMonth[currentMonth]}`;
+
+        let tracker = document.getElementById("tracker");
+        let completedDays = JSON.parse(localStorage.getItem("completedDays")) || [];
+
+        for (let i = 1; i <= daysInMonth[currentMonth]; i++) {
+            let dayDiv = document.createElement("div");
+            dayDiv.classList.add("day");
+            dayDiv.innerText = i;
+            if (completedDays.includes(i)) {
+                dayDiv.classList.add("completed");
+            }
+            if (i === date.getDate()) {
+                dayDiv.classList.add("today");
+            }
+            dayDiv.addEventListener("click", function () {
+                this.classList.add("clicked");
+                setTimeout(() => this.classList.remove("clicked"), 200);
+                
+                if (completedDays.includes(i)) {
+                    completedDays = completedDays.filter(day => day !== i);
+                    dayDiv.classList.remove("completed");
+                } else {
+                    completedDays.push(i);
+                    dayDiv.classList.add("completed");
+                }
+                localStorage.setItem("completedDays", JSON.stringify(completedDays));
+                document.getElementById("totalDays").innerText = `${completedDays.length}/${daysInMonth[currentMonth]}`;
+            });
+            tracker.appendChild(dayDiv);
+        }
+
+        document.getElementById("habitTitle").addEventListener("click", function () {
+            let habit = prompt("What's your habit?", this.innerText);
+            if (habit) {
+                this.innerText = habit;
+            }
+        });
+
+        document.getElementById("resetbutton").addEventListener("click", function () {
+            localStorage.removeItem("completedDays");
+            location.reload();
+        });
+    });
+</script>
+</html>
